@@ -11,8 +11,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
-    res.sendFile("https://form0018.netlify.app/");
+    res.redirect("https://form0018.netlify.app/");
 });
+
 
 const url = process.env.MONGO_URL;
 mongoose.connect(url)
