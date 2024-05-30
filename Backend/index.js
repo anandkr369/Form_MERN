@@ -1,22 +1,19 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const path = require('path');
-const app = express();
-const port = 4000 || process.env.PORT;
 const { Parser } = require('json2csv');
 const dotenv = require('dotenv');
+const { createProxyMiddleware } = require('http-proxy-middleware');
+
 dotenv.config();
+
+const app = express();
+const port = process.env.PORT || 4000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/', (req, res) => {
-    res.redirect("https://form0018.netlify.app/");
-});
-
-
 const url = process.env.MONGO_URL;
-mongoose.connect(url)
+mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
         console.log("Connected to MongoDB successfully!");
     })
@@ -62,7 +59,6 @@ app.post('/submit', (req, res) => {
         .catch(err => res.status(400).json({ message: err.message }));
 });
 
-
 app.get(`/${process.env.SECRETKEY}`, async (req, res) => {
     try {
         const users = await User.find({});
@@ -79,7 +75,14 @@ app.get(`/${process.env.SECRETKEY}`, async (req, res) => {
     }
 });
 
-
+// Proxy requests to the frontend hosted on Netlify
+app.use('/', createProxyMiddleware({
+    target: 'https://form0018.netlify.app',
+    changeOrigin: true,
+    pathRewrite: {
+        '^/': '/', 
+    },
+}));
 
 app.listen(port, () => {
     console.log(`Listening on port ${port}...`);
