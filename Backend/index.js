@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
-    res.sendFile("D:/FormMERN/Frontend/form.html");
+    res.sendFile("https://form0018.netlify.app/");
 });
 
 const url = process.env.MONGO_URL;
